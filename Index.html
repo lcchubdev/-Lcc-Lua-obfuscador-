@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Lua Obfuscator</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: #e5e7eb;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #38bdf8;
+    }
+    textarea {
+      width: 100%;
+      height: 220px;
+      background: #020617;
+      color: #e5e7eb;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px;
+      resize: vertical;
+    }
+    button {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      margin-top: 10px;
+      margin-right: 5px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #0369a1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Lua Obfuscator</h1>
+
+  <p>Cole seu código Lua:</p>
+  <textarea id="luaInput" placeholder="Cole seu código Lua aqui..."></textarea>
+
+  <br>
+  <button onclick="obfuscar()">Obfuscar</button>
+  <button onclick="copiar()">Copiar</button>
+  <button onclick="baixar()">Baixar .lua</button>
+
+  <p>Código obfuscado:</p>
+  <textarea id="luaOutput" placeholder="Código obfuscado aparecerá aqui..." readonly></textarea>
+
+  <script>
+    function base64Encode(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function gerarNome() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      let nome = "";
+      for (let i = 0; i < 16; i++) {
+        nome += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return nome;
+    }
+
+    function obfuscar() {
+      const codigo = document.getElementById("luaInput").value;
+      if (!codigo.trim()) {
+        alert("Cole um código Lua primeiro!");
+        return;
+      }
+
+      const encoded = base64Encode(codigo);
+      const var1 = gerarNome();
+      const var2 = gerarNome();
+      const var3 = gerarNome();
+
+      const obfuscado = `
+local ${var1} = "${encoded}"
+
+local function ${var2}(data)
+  local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  data = string.gsub(data, '[^'..b..'=]', '')
+  return (data:gsub('.', function(x)
+    if (x == '=') then return '' end
+    local r,f='',(b:find(x)-1)
+    for i=6,1,-1 do r=r..(f%2^i - f%2^(i-1) > 0 and '1' or '0') end
+    return r
+  end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
+    if (#x ~= 8) then return '' end
+    local c=0
+    for i=1,8 do c=c + (x:sub(i,i)=='1' and 2^(8-i) or 0) end
+    return string.char(c)
+  end))
+end
+
+local ${var3} = loadstring(${var2}(${var1}))
+${var3}()
+      `.trim();
+
+      document.getElementById("luaOutput").value = obfuscado;
+    }
+
+    function copiar() {
+      const out = document.getElementById("luaOutput");
+      out.select();
+      document.execCommand("copy");
+      alert("Código copiado!");
+    }
+
+    function baixar() {
+      const texto = document.getElementById("luaOutput").value;
+      if (!texto) {
+        alert("Nada para baixar!");
+        return;
+      }
+
+      const blob = new Blob([texto], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "codigo_obfuscado.lua";
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
