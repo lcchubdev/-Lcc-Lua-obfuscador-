@@ -1,132 +1,227 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Lua Obfuscator</title>
-  <style>
-    body {
-      background: #0f172a;
-      color: #e5e7eb;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      color: #38bdf8;
-    }
-    textarea {
-      width: 100%;
-      height: 220px;
-      background: #020617;
-      color: #e5e7eb;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 10px;
-      resize: vertical;
-    }
-    button {
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      margin-top: 10px;
-      margin-right: 5px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #0369a1;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Lcc Lua Obfuscator</title>
+
+<meta name="description" content="Lcc Lua Obfuscator - Obfuscador de código Lua online.">
+<meta name="author" content="Lcc Hub">
+
+<style>
+body{
+  background:#020617;
+  color:#e5e7eb;
+  font-family:Arial,sans-serif;
+  padding:20px;
+  max-width:900px;
+  margin:auto;
+  overflow-x:hidden;
+}
+
+.particles{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.particle{
+  position:absolute;
+  width:8px;height:8px;
+  background:#38bdf8;
+  border-radius:50%;
+  box-shadow:0 0 12px #38bdf8;
+  animation:float linear infinite;
+}
+@keyframes float{
+  from{transform:translateY(110vh)}
+  to{transform:translateY(-10vh)}
+}
+
+h1{color:#38bdf8;text-align:center}
+
+.card{
+  background:rgba(2,6,23,.9);
+  border:1px solid #334155;
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:20px;
+}
+
+textarea{
+  width:100%;
+  height:220px;
+  background:#020617;
+  color:#e5e7eb;
+  border:1px solid #334155;
+  border-radius:10px;
+  padding:10px;
+}
+
+.buttons,.links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-top:10px;
+}
+
+button,.link-btn{
+  background:#0284c7;
+  color:white;
+  border:none;
+  padding:12px 18px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  text-decoration:none;
+  transition:.25s;
+}
+
+button:hover,.link-btn:hover{
+  background:#0369a1;
+  transform:scale(1.08);
+  box-shadow:0 0 15px #38bdf8;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+}
+
+.modal-content{
+  background:#020617;
+  padding:20px;
+  border-radius:14px;
+  max-width:600px;
+  width:100%;
+}
+
+footer{text-align:center;font-size:13px;opacity:.7}
+</style>
 </head>
+
 <body>
 
-  <h1>🔐 Lua Obfuscator</h1>
+<div class="particles" id="particles"></div>
 
+<h1>🔐 Lcc Lua Obfuscator</h1>
+
+<div class="card">
+  <h3>🔗 Links Oficiais</h3>
+  <div class="links">
+    <button onclick="abrirScript()">📜 Script</button>
+    <a href="https://chat.whatsapp.com/KfRhQZswl8y6sPkqH59CEx" target="_blank" class="link-btn">💬 WhatsApp</a>
+    <a href="https://discord.gg/rqXwmbZvqt" target="_blank" class="link-btn">🎮 Discord</a>
+  </div>
+</div>
+
+<div class="card">
   <p>Cole seu código Lua:</p>
-  <textarea id="luaInput" placeholder="Cole seu código Lua aqui..."></textarea>
+  <textarea id="luaInput"></textarea>
 
-  <br>
-  <button onclick="obfuscar()">Obfuscar</button>
-  <button onclick="copiar()">Copiar</button>
-  <button onclick="baixar()">Baixar .lua</button>
+  <div class="buttons">
+    <button onclick="obfuscar()">Obfuscar</button>
+    <button onclick="copiar()">Copiar</button>
+    <button onclick="baixar()">Baixar .lua</button>
+  </div>
 
-  <p>Código obfuscado:</p>
-  <textarea id="luaOutput" placeholder="Código obfuscado aparecerá aqui..." readonly></textarea>
+  <p style="margin-top:15px;">Código obfuscado:</p>
+  <textarea id="luaOutput" readonly></textarea>
+</div>
 
-  <script>
-    function base64Encode(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
+<!-- CARD PIX -->
+<div class="card" style="text-align:center;">
+  <h3 style="color:#38bdf8;">💙 Apoie o Projeto</h3>
+  <p>Doe qualquer valor para a vaquinha de um PC Gamer</p>
 
-    function gerarNome() {
-      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      let nome = "";
-      for (let i = 0; i < 16; i++) {
-        nome += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return nome;
-    }
+  <textarea id="pixKey" readonly style="height:70px;text-align:center;">
+3c07308c-2153-42a2-9f7f-82a669635414
+  </textarea>
 
-    function obfuscar() {
-      const codigo = document.getElementById("luaInput").value;
-      if (!codigo.trim()) {
-        alert("Cole um código Lua primeiro!");
-        return;
-      }
+  <div class="buttons">
+    <button onclick="copiarPix()">📋 Copiar chave PIX</button>
+  </div>
+</div>
 
-      const encoded = base64Encode(codigo);
-      const var1 = gerarNome();
-      const var2 = gerarNome();
-      const var3 = gerarNome();
+<div class="modal" id="scriptModal">
+  <div class="modal-content">
+    <h3>📜 Loadstring Oficial</h3>
+    <textarea readonly onclick="this.select()">
+loadstring(game:HttpGet("https://raw.githubusercontent.com/pedrohenriquecarvalhofari-tech/lcc-hub-2026-atualizado/refs/heads/main/lcc%20hub%20atualizado%202026"))()
+    </textarea>
+    <div class="buttons">
+      <button onclick="copiarScript()">Copiar</button>
+      <button onclick="fecharScript()">Fechar</button>
+    </div>
+  </div>
+</div>
 
-      const obfuscado = `
-local ${var1} = "${encoded}"
+<footer>© 2026 Lcc Hub</footer>
 
-local function ${var2}(data)
-  local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-  data = string.gsub(data, '[^'..b..'=]', '')
-  return (data:gsub('.', function(x)
-    if (x == '=') then return '' end
-    local r,f='',(b:find(x)-1)
-    for i=6,1,-1 do r=r..(f%2^i - f%2^(i-1) > 0 and '1' or '0') end
-    return r
-  end):gsub('%d%d%d?%d?%d?%d?%d?%d?', function(x)
-    if (#x ~= 8) then return '' end
-    local c=0
-    for i=1,8 do c=c + (x:sub(i,i)=='1' and 2^(8-i) or 0) end
-    return string.char(c)
-  end))
-end
+<script>
+/* PARTICULAS */
+const particles=document.getElementById("particles")
+for(let i=0;i<40;i++){
+  const p=document.createElement("div")
+  p.className="particle"
+  p.style.left=Math.random()*100+"%"
+  p.style.animationDuration=(8+Math.random()*12)+"s"
+  p.style.animationDelay=Math.random()*5+"s"
+  particles.appendChild(p)
+}
 
-local ${var3} = loadstring(${var2}(${var1}))
-${var3}()
-      `.trim();
+/* MODAL */
+function abrirScript(){scriptModal.style.display="flex"}
+function fecharScript(){scriptModal.style.display="none"}
+function copiarScript(){
+  document.querySelector("#scriptModal textarea").select()
+  document.execCommand("copy")
+  alert("Loadstring copiado!")
+}
 
-      document.getElementById("luaOutput").value = obfuscado;
-    }
+/* PIX */
+function copiarPix(){
+  const pix=document.getElementById("pixKey")
+  pix.select()
+  document.execCommand("copy")
+  alert("Chave PIX copiada 💙 Obrigado pelo apoio!")
+}
 
-    function copiar() {
-      const out = document.getElementById("luaOutput");
-      out.select();
-      document.execCommand("copy");
-      alert("Código copiado!");
-    }
-
-    function baixar() {
-      const texto = document.getElementById("luaOutput").value;
-      if (!texto) {
-        alert("Nada para baixar!");
-        return;
-      }
-
-      const blob = new Blob([texto], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "codigo_obfuscado.lua";
-      link.click();
-    }
-  </script>
+/* OBFUSCADOR */
+function base64Encode(s){return btoa(unescape(encodeURIComponent(s)))}
+function gerarNome(){
+  const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  let n=""
+  for(let i=0;i<16;i++) n+=c[Math.floor(Math.random()*c.length)]
+  return n
+}
+function obfuscar(){
+  if(!luaInput.value.trim()) return alert("Cole um código Lua!")
+  const e=base64Encode(luaInput.value)
+  const a=gerarNome(),b=gerarNome(),c=gerarNome()
+  luaOutput.value=`local ${a}="${e}"
+local function ${b}(d)
+local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+d=d:gsub('[^'..b..'=]','')
+return(d:gsub('.',function(x)
+if x=='=' then return '' end
+local r,f='',(b:find(x)-1)
+for i=6,1,-1 do r=r..(f%2^i-f%2^(i-1)>0 and '1'or'0')end
+return r end):gsub('%d%d%d?%d?%d?%d?%d?%d?',function(x)
+if #x~=8 then return '' end
+local c=0 for i=1,8 do c=c+(x:sub(i,i)=='1'and2^(8-i)or0)end
+return string.char(c)end))end
+local ${c}=loadstring(${b}(${a})) ${c}()`
+}
+function copiar(){luaOutput.select();document.execCommand("copy")}
+function baixar(){
+  const b=new Blob([luaOutput.value],{type:"text/plain"})
+  const a=document.createElement("a")
+  a.href=URL.createObjectURL(b)
+  a.download="codigo_obfuscado.lua"
+  a.click()
+}
+</script>
 
 </body>
 </html>
